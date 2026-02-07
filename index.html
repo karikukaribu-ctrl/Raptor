@@ -2,256 +2,883 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EPS — Questionnaire → Rapport</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>EPS — Click&Report (QCM → Grille + Rapport)</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#0f1115;color:#e9edf5}
-    header{position:sticky;top:0;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
-    main{max-width:980px;margin:0 auto;padding:16px}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px}
-    .nav{display:flex;gap:8px;flex-wrap:wrap}
-    button{background:rgba(255,255,255,.06);color:#e9edf5;border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px 12px;cursor:pointer}
-    button:hover{background:rgba(255,255,255,.10)}
-    .active{outline:2px solid rgba(255,255,255,.25)}
-    label{display:block;margin:10px 0 6px;color:#a8b0bd}
-    input[type="text"], textarea{
-      width:100%;box-sizing:border-box;background:rgba(0,0,0,.25);color:#e9edf5;
-      border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px
+    :root{
+      --bg:#0f1115; --fg:#e9edf5; --muted:#a8b0bd;
+      --card:rgba(255,255,255,.045); --card2:rgba(255,255,255,.03);
+      --bd:rgba(255,255,255,.10); --bd2:rgba(255,255,255,.07);
+      --r:18px;
+      --shadow:0 18px 60px rgba(0,0,0,.55);
     }
-    .opt{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
-    .opt input{margin-top:3px}
-    .muted{color:#a8b0bd}
-    .split{display:grid;grid-template-columns:1fr;gap:12px}
-    @media(min-width:920px){.split{grid-template-columns:1.1fr .9fr}}
-    .small{font-size:12px}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(15,17,21,.86);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--bd2);
+      padding:14px 16px;
+    }
+    .wrap{max-width:1180px;margin:0 auto;padding:16px}
+    .topRow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .title{font-weight:800;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:12px;margin-top:2px}
+    .btn{
+      background:rgba(255,255,255,.06);color:var(--fg);
+      border:1px solid var(--bd);border-radius:14px;padding:10px 12px;
+      cursor:pointer; user-select:none;
+    }
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .btn.danger{border-color:rgba(255,120,120,.35)}
+    .btn.ghost{background:transparent}
+    .grid{
+      display:grid;gap:12px;
+      grid-template-columns:1fr;
+    }
+    @media(min-width:1060px){ .grid{grid-template-columns:1.05fr .95fr;} }
+    .card{
+      background:var(--card);
+      border:1px solid var(--bd2);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0;padding:12px 14px;
+      font-size:14px;
+      background:var(--card2);
+      border-bottom:1px solid var(--bd2);
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+    }
+    .card .content{padding:12px 14px}
+    .nav{
+      display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--bd2);
+      background:rgba(255,255,255,.02);
+    }
+    .tab{padding:8px 10px;border-radius:12px;border:1px solid var(--bd2);background:rgba(255,255,255,.03);cursor:pointer;font-size:13px}
+    .tab.active{outline:2px solid rgba(255,255,255,.22)}
+    .muted{color:var(--muted)}
+    label{display:block;margin:10px 0 6px;color:var(--muted);font-size:12px}
+    input[type="text"], input[type="number"], textarea, select{
+      width:100%;padding:10px;border-radius:12px;
+      border:1px solid var(--bd2);
+      background:rgba(0,0,0,.25);color:var(--fg);
+      outline:none;
+    }
+    textarea{min-height:72px;resize:vertical}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .col{flex:1;min-width:160px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      border:1px solid var(--bd2);
+      background:rgba(255,255,255,.04);
+      border-radius:999px;
+      padding:7px 10px;
+      cursor:pointer;
+      font-size:13px;
+      user-select:none;
+    }
+    .chip.on{outline:2px solid rgba(255,255,255,.22)}
+    .chip.off{opacity:.75}
+    .sep{height:1px;background:var(--bd2);margin:12px 0}
+    .mini{font-size:12px;color:var(--muted)}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .box{
+      border:1px solid var(--bd2); background:rgba(255,255,255,.03);
+      border-radius:14px;padding:10px 12px;min-width:160px
+    }
+    .kpi .n{font-weight:800;font-size:16px}
+    .kpi .t{font-size:12px;color:var(--muted)}
+    .reportArea{width:100%;min-height:340px}
+    .smallBtn{font-size:12px;padding:8px 10px;border-radius:12px}
+    .badge{
+      font-size:11px;color:var(--muted);border:1px solid var(--bd2);
+      padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.03)
+    }
+    .toggleRow{display:flex;gap:8px;flex-wrap:wrap}
   </style>
 </head>
 <body>
+
 <header>
-  <div class="row" style="align-items:center;justify-content:space-between">
+  <div class="topRow">
     <div>
-      <div style="font-weight:700">EPS — Questionnaire → Rapport</div>
-      <div class="muted small">Local-only • multi-choix + notes • génération texte</div>
+      <div class="title">EPS — Click&Report</div>
+      <div class="sub">Choix multiples → Grille remplie + Rapport narratif • localStorage • export JSON</div>
     </div>
     <div class="row">
-      <button id="btnExport">Exporter JSON</button>
-      <button id="btnReset">Reset</button>
+      <button class="btn ghost" id="btnMode">Mode : <span id="modeLabel">Narratif</span></button>
+      <button class="btn" id="btnCopy">Copier</button>
+      <button class="btn" id="btnExport">Exporter JSON</button>
+      <button class="btn danger" id="btnReset">Reset</button>
     </div>
   </div>
 </header>
 
-<main class="split">
+<div class="wrap grid">
+
   <section class="card">
+    <h2>
+      <span>Formulaire (clic-clic)</span>
+      <span class="badge" id="statusBadge">Auto-save ✓</span>
+    </h2>
     <div class="nav" id="nav"></div>
-    <div id="section"></div>
+    <div class="content" id="form"></div>
   </section>
 
   <aside class="card">
-    <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
-      <div style="font-weight:700">Rapport généré</div>
-      <button id="btnCopy">Copier</button>
+    <h2>
+      <span>Résultat final</span>
+      <span class="toggleRow">
+        <button class="btn smallBtn" id="btnGen">Régénérer</button>
+        <button class="btn smallBtn" id="btnCheck">Contrôles</button>
+      </span>
+    </h2>
+    <div class="content">
+      <div class="kpi">
+        <div class="box"><div class="n" id="kAnswered">0</div><div class="t">Champs renseignés</div></div>
+        <div class="box"><div class="n" id="kRisk">—</div><div class="t">Risque suicidaire</div></div>
+        <div class="box"><div class="n" id="kDx">—</div><div class="t">Hypothèse principale</div></div>
+      </div>
+      <div class="sep"></div>
+      <textarea id="output" class="reportArea" placeholder="Le rapport apparaît ici…"></textarea>
+      <div class="mini" id="checks"></div>
     </div>
-    <div class="muted small" style="margin:6px 0 10px">
-      Tu peux créer une version “trame” + une version “narrative” en changeant les templates.
-    </div>
-    <textarea id="report" rows="28" placeholder="Le rapport apparaîtra ici…"></textarea>
   </aside>
-</main>
+
+</div>
 
 <script>
-/** ============
- *  1) Définition du formulaire (EXEMPLE MINIMAL)
- *  -> Ajoute ici toutes les sections/items du PDF
- *  ============ */
-const FORM = [
+/* =========================================================
+   EPS Click&Report — moteur de formulaire + générateur texte
+   - multi-choix, toggles, textes, nombres
+   - localStorage
+   - grille (structurée) + narratif
+   ========================================================= */
+
+const KEY = "eps_click_report_v1";
+
+/* --------- Outils texte --------- */
+const clean = (s)=> (s??"").toString().trim();
+const cap = (s)=> s ? s.charAt(0).toUpperCase()+s.slice(1) : "";
+const joinNice = (arr)=> {
+  arr = (arr||[]).filter(Boolean);
+  if(arr.length===0) return "";
+  if(arr.length===1) return arr[0];
+  if(arr.length===2) return arr[0] + " et " + arr[1];
+  return arr.slice(0,-1).join(", ") + ", et " + arr[arr.length-1];
+};
+const uniq = (arr)=> Array.from(new Set((arr||[]).filter(Boolean)));
+
+/* --------- Schéma (MAX de choix) --------- */
+const SCHEMA = [
   {
-    id: "prise_en_charge",
-    title: "1. Prise en charge",
-    blocks: [
-      { type:"text", id:"motif", label:"Motif / plainte principale (patient et/ou entourage)",
-        report: (v)=> v?.trim() ? `Motif/Plainte : ${v.trim()}.` : "" },
-      { type:"single", id:"cadre", label:"Cadre de soins",
-        options:["Soins libres","Soins sans consentement"],
-        report: (v)=> v ? `Cadre : ${v}.` : "" },
-      { type:"text", id:"referent", label:"Psychiatre référent (nom)",
-        report: (v)=> v?.trim() ? `Référent : ${v.trim()}.` : "" }
+    id:"en_tete",
+    title:"En-tête",
+    blocks:[
+      {type:"date", id:"date_exam", label:"Date de l’examen"},
+      {type:"text", id:"examinateur", label:"Examinatrice / Examinat·eur"},
+      {type:"text", id:"patient_nom", label:"Patient (initiales / code)"},
+      {type:"number", id:"age", label:"Âge (années)"},
+      {type:"single", id:"sexe", label:"Sexe (administratif)", options:["F","M","X/Autre","Non précisé"]},
+      {type:"text", id:"motif", label:"Motif / plainte principale (patient et/ou entourage)"},
+      {type:"single", id:"cadre", label:"Cadre", options:["Soins libres","Soins sans consentement","Observation / évaluation","Autre"]},
     ]
   },
+
   {
-    id: "mse_pensee",
-    title: "6. Entretien — Pensées (exemple)",
-    blocks: [
-      { type:"single", id:"rythme_pensee", label:"Rythme de la pensée",
-        options:["Normal","Diminué","Augmenté"],
-        report: (v)=> v ? `Pensée — rythme : ${v}.` : "" },
-      { type:"multi", id:"contenu_pensee", label:"Contenu (cocher si présent)",
-        options:["Idées délirantes","Soucis/inquiétudes excessifs","Idées obsessionnelles","Idées de mort / suicide"],
-        report: (arr)=> (arr?.length? `Pensée — contenu : ${arr.join(", ")}.` : "") },
-      { type:"text", id:"notes_pensee", label:"Notes (ex : thèmes, mécanismes, retentissement)",
-        report: (v)=> v?.trim()? `Pensée — notes : ${v.trim()}.` : "" }
+    id:"prise_en_charge",
+    title:"Prise en charge",
+    blocks:[
+      {type:"text", id:"psy_ref", label:"Psychiatre référent"},
+      {type:"text", id:"mg", label:"Médecin généraliste"},
+      {type:"multi", id:"reseau", label:"Professionnels impliqués", options:[
+        "Psychologue","Infirmier·e","Assistant·e social·e","Éducateur·rice","Ergo/psychomot","Kinésithérapeute",
+        "Addictologue","Neurologue","Médecin du travail","Gynécologue","Sage-femme","Service d’aide à domicile",
+        "Famille / proche aidant"
+      ]},
+      {type:"text", id:"notes_prise", label:"Notes (coordination, contacts, contraintes)"},
+    ]
+  },
+
+  {
+    id:"antecedents",
+    title:"Antécédents",
+    blocks:[
+      {type:"multi", id:"addictions", label:"Addictologie — substances / comportements (cocher si présent)", options:[
+        "Tabac","Alcool","Cannabis","Cocaïne","Amphétamines","MDMA","Opioïdes","Benzodiazépines","Hypnotiques",
+        "Hallucinogènes","Kétamine","Inhalants","Autre substance","Jeux d’argent","Jeux vidéo","Sexe compulsif","Achats compulsifs"
+      ]},
+      {type:"text", id:"add_notes", label:"Addictologie — détails (fréquences, retentissement, dernier usage)"},
+      {type:"multi", id:"psy_ante", label:"Antécédents psychiatriques", options:[
+        "Épisode dépressif","Trouble bipolaire","Trouble anxieux","Trouble panique","TOC",
+        "PTSD / trauma","Psychose / schizophrénie","Trouble de personnalité","TCA","TDAH",
+        "Trouble du sommeil","Addiction","Autre"
+      ]},
+      {type:"text", id:"psy_hosp", label:"Hospitalisations / suivis / traitements antérieurs (résumé)"},
+      {type:"single", id:"ts_vie", label:"Antécédents de tentative de suicide", options:["Non","Oui","Inconnu"]},
+      {type:"text", id:"ts_details", label:"TS — détails (année, méthode, gravité, contexte)"},
+      {type:"multi", id:"med_ante", label:"Antécédents médicaux généraux", options:[
+        "Aucun notable","Asthme","Épilepsie","Migraine","HTA","Diabète","Hypo/Hyperthyroïdie","Cardiopathie",
+        "Pathologie respiratoire","Pathologie hépatique","Pathologie rénale","Douleurs chroniques","Grossesse récente",
+        "Neurodéveloppemental","Autre"
+      ]},
+      {type:"text", id:"allergies", label:"Allergies"},
+      {type:"text", id:"famille", label:"Antécédents familiaux (psy/addicto + somatique)"},
+    ]
+  },
+
+  {
+    id:"traitements",
+    title:"Traitements actuels",
+    blocks:[
+      {type:"multi", id:"classes", label:"Classes de psychotropes (cocher si prescrit/consommé)", options:[
+        "ISRS/IRSNa","Tricycliques","IMAO","Thymorégulateur (lithium/valproate/lamotrigine)","Antipsychotique",
+        "BZD","Hypnotique","Antihistaminique sédatif","Stimulant (TDAH)","Autre psychotrope"
+      ]},
+      {type:"text", id:"ttt_details", label:"Détails traitements (molécule — dose — observance — date)"},
+      {type:"multi", id:"non_pharma", label:"Non pharmacologique", options:[
+        "Psychothérapie","TCC","EMDR","Psychanalytique","Groupe","Psychoéducation","Réhab psycho-sociale",
+        "Activité physique","Méditation/relax","Luminothérapie","Autre"
+      ]},
+      {type:"text", id:"ttt_notes", label:"Notes (observance, automodifications, effets indésirables)"},
+    ]
+  },
+
+  {
+    id:"contexte",
+    title:"Contexte familial et social",
+    blocks:[
+      {type:"single", id:"emploi", label:"Situation pro", options:[
+        "Emploi","Études","Chômage","Incapacité / arrêt","Invalidité","Sans statut","Autre"
+      ]},
+      {type:"single", id:"logement", label:"Logement", options:[
+        "Seul·e","Avec partenaire","Avec famille","Colocation","Hébergement précaire","Sans-abri","Institution/foyer","Autre"
+      ]},
+      {type:"multi", id:"stress", label:"Facteurs de stress récents", options:[
+        "Rupture","Conflit familial","Conflit pro","Problème logement","Finances","Deuil","Procédure légale",
+        "Trauma récent","Somatique","Isolement","Discrimination","Maternité/paternité","Autre"
+      ]},
+      {type:"text", id:"social_notes", label:"Notes (ressources, soutien, protection, tuteur/curateur)"},
+    ]
+  },
+
+  {
+    id:"mse",
+    title:"Entretien (MSE)",
+    blocks:[
+      {type:"multi", id:"apparence", label:"Présentation / comportement", options:[
+        "Tenue adaptée","Tenue négligée","Hygiène diminuée","Agitation","Ralenti","Contact froid",
+        "Contact méfiant","Coopérant","Hostile","Désinhibition","Évitement du regard","Pleurs faciles"
+      ]},
+      {type:"multi", id:"langage", label:"Langage", options:[
+        "Normal","Tachyphémie","Bradyphémie","Mutisme","Logorrhée","Pression du discours","Barrages",
+        "Pauvreté du discours","Néologismes","Coq-à-l’âne","Dysarthrie","Prosodie monotone","Prosodie variable"
+      ]},
+
+      {type:"multi", id:"pensee_forme", label:"Pensée — forme", options:[
+        "Normale","Tachypsychie","Bradypsychie","Fuite des idées","Digressions","Dérive","Incohérence légère",
+        "Incohérence marquée","Persévération","Pensée concrète","Pensée désorganisée"
+      ]},
+      {type:"multi", id:"pensee_contenu", label:"Pensée — contenu", options:[
+        "Ruminations anxieuses","Idées de culpabilité","Idées d’incurabilité","Idées de référence",
+        "Idées persécutives","Idées mégalomaniaques","Obsession","Phobie","Intrusions/flashbacks",
+        "Idées de mort","Idées suicidaires","Idées délirantes (autre thème)"
+      ]},
+      {type:"text", id:"pensee_notes", label:"Pensée — notes (thèmes, mécanismes, critique, retentissement)"},
+
+      {type:"multi", id:"humeur", label:"Affectivité / humeur", options:[
+        "Euthymie","Humeur dépressive","Dysphorie","Anxiété marquée","Irritabilité","Labilité",
+        "Anhédonie","Apathie","Élévation de l’humeur","Émoussement affectif","Réactivité conservée"
+      ]},
+      {type:"text", id:"humeur_notes", label:"Affectivité — notes"},
+
+      {type:"multi", id:"perception", label:"Perception", options:[
+        "Aucune anomalie","Illusions","Hallucinations auditives","Hallucinations visuelles","Hallucinations cénesthésiques",
+        "Hallucinations olfactives","Déréalisation","Dépersonnalisation","Automatisme mental (ressenti)","Voix au seuil du sommeil"
+      ]},
+      {type:"text", id:"perception_notes", label:"Perception — notes"},
+
+      {type:"multi", id:"cognition", label:"Cognition", options:[
+        "Orientation OK","Attention diminuée","Mémoire diminuée","Désorganisation","Trouble exécutif",
+        "Niveau de conscience altéré","Désinhibition cognitive","Insight partiel","Insight absent"
+      ]},
+      {type:"multi", id:"fonctions_physio", label:"Fonctions physiologiques", options:[
+        "Sommeil normal","Insomnie","Hypersomnie","Cauchemars","Appétit diminué","Appétit augmenté",
+        "Perte de poids","Prise de poids","Libido diminuée","Libido augmentée"
+      ]},
+      {type:"multi", id:"psycho_mot", label:"Motricité", options:[
+        "Normale","Agitation psychomotrice","Ralentissement psychomoteur","Akathisie subjective",
+        "Tics","Catatonie (suspicion)","Stéréotypies","Agressivité verbale"
+      ]},
+      {type:"text", id:"mse_notes", label:"Notes MSE générales"},
+    ]
+  },
+
+  {
+    id:"risques",
+    title:"Risques",
+    blocks:[
+      {type:"single", id:"wish_dead", label:"Souhait d’être mort·e (dernier mois)", options:["Non","Oui","Inconnu"]},
+      {type:"single", id:"selfharm_urge", label:"Volonté de se faire du mal (dernier mois)", options:["Non","Oui","Inconnu"]},
+      {type:"single", id:"si_idea", label:"Pensées suicidaires (dernier mois)", options:["Non","Oui","Inconnu"]},
+      {type:"single", id:"si_plan", label:"Plan / scénario suicidaire (dernier mois)", options:["Non","Oui","Inconnu"]},
+      {type:"single", id:"si_attempt_month", label:"Tentative suicidaire (dernier mois)", options:["Non","Oui","Inconnu"]},
+      {type:"multi", id:"protect", label:"Facteurs protecteurs", options:[
+        "Lien familial","Lien amical","Enfants","Projet pro/études","Spiritualité/valeurs","Peur de mourir",
+        "Alliance thérapeutique","Accès aux soins","Capacité de demander de l’aide"
+      ]},
+      {type:"multi", id:"risk_plus", label:"Facteurs aggravants", options:[
+        "Impulsivité","Substances","Isolement","Insomnie","Trauma récent","Psychose","Désespoir","Douleur chronique",
+        "Conflit logement/finances","Accès à moyens létaux"
+      ]},
+      {type:"text", id:"risk_notes", label:"Notes risque (moyens, timing, facteurs, stratégie)"},
+      {type:"single", id:"ha_current", label:"Idées hétéro-agressives actuelles", options:["Non","Oui","Inconnu"]},
+      {type:"text", id:"ha_notes", label:"Notes hétéro-agressivité (contexte, accès armes, plan)"},
+    ]
+  },
+
+  {
+    id:"somatique",
+    title:"Somatique / paraclinique",
+    blocks:[
+      {type:"number", id:"ta_sys", label:"TA systolique"},
+      {type:"number", id:"ta_dia", label:"TA diastolique"},
+      {type:"number", id:"fc", label:"FC"},
+      {type:"number", id:"temp", label:"Température (°C)"},
+      {type:"number", id:"spo2", label:"SpO2 (%)"},
+      {type:"number", id:"poids", label:"Poids (kg)"},
+      {type:"number", id:"taille", label:"Taille (cm)"},
+      {type:"multi", id:"som_signes", label:"Signes somatiques (si présents)", options:[
+        "Asthénie","Nausées/vomissements","Constipation","Diarrhée","Douleur thoracique","Palpitations",
+        "Dyspnée","Toux","Céphalées","Douleurs abdominales","Douleurs pelviennes","Troubles menstruels",
+        "Lésions cutanées/auto-agression","Autre"
+      ]},
+      {type:"text", id:"som_notes", label:"Examen clinique — notes"},
+      {type:"multi", id:"paraclin", label:"Paraclinique (disponible / à faire)", options:[
+        "ECG fait","ECG à faire","Bilan sanguin fait","Bilan sanguin à faire","Tox urinaires faits","Tox urinaires à faire",
+        "Grossesse urinaire faite","Grossesse urinaire à faire","IRM/CT à discuter","EEG à discuter"
+      ]},
+      {type:"text", id:"paraclin_notes", label:"Résultats / anomalies — notes"},
+    ]
+  },
+
+  {
+    id:"conclusion",
+    title:"Conclusion / Plan",
+    blocks:[
+      {type:"multi", id:"hypotheses", label:"Hypothèses (cocher)", options:[
+        "Épisode dépressif","Épisode dépressif avec éléments mixtes","Trouble bipolaire (à confirmer)",
+        "Trouble anxieux / panique","PTSD / trauma","Psychose primaire (à discuter)",
+        "Symptômes psychotiques induits/majorés (substances/insomnie)","Trouble de personnalité (à explorer)",
+        "Trouble addictif","Trouble du sommeil","Autre"
+      ]},
+      {type:"single", id:"niveau_soin", label:"Orientation", options:[
+        "Retour domicile + suivi rapproché","Hospitalisation brève","Hospitalisation complète",
+        "Hôpital de jour / intensif ambulatoire","Évaluation complémentaire","Autre"
+      ]},
+      {type:"multi", id:"plan", label:"Plan (cocher)", options:[
+        "Sécurisation / contrat de sécurité","Réévaluation risque rapprochée","Arrêt substances / sevrage",
+        "Restauration sommeil","Adaptation psychotropes","Psychoéducation","Mise en lien réseau",
+        "Bilan somatique","Certificat / arrêt","Contact proches (avec accord)","Autre"
+      ]},
+      {type:"text", id:"plan_notes", label:"Synthèse + plan détaillé (texte libre)"},
     ]
   }
 ];
 
-/** ============
- *  2) Stockage local
- *  ============ */
-const KEY = "eps_form_v1";
-const state = load() || { sectionId: FORM[0].id, answers: {} };
+/* --------- État --------- */
+const state = load() || {
+  sectionId: SCHEMA[0].id,
+  mode: "narratif", // ou "grille"
+  answers: {}
+};
 
 function load(){
   try{ return JSON.parse(localStorage.getItem(KEY)); }catch{ return null; }
 }
 function save(){
   localStorage.setItem(KEY, JSON.stringify(state));
+  flashBadge("Auto-save ✓");
+}
+let badgeTimer=null;
+function flashBadge(txt){
+  const b=document.getElementById("statusBadge");
+  b.textContent=txt;
+  if(badgeTimer) clearTimeout(badgeTimer);
+  badgeTimer=setTimeout(()=> b.textContent="Auto-save ✓", 800);
 }
 
-/** ============
- *  3) Rendu UI
- *  ============ */
+/* --------- Rendu navigation --------- */
 const navEl = document.getElementById("nav");
-const sectionEl = document.getElementById("section");
-const reportEl = document.getElementById("report");
+const formEl = document.getElementById("form");
+const outEl  = document.getElementById("output");
+const checksEl = document.getElementById("checks");
 
 function renderNav(){
-  navEl.innerHTML = "";
-  for(const s of FORM){
-    const b = document.createElement("button");
-    b.textContent = s.title;
-    if(s.id === state.sectionId) b.classList.add("active");
-    b.onclick = ()=>{ state.sectionId = s.id; save(); render(); };
-    navEl.appendChild(b);
+  navEl.innerHTML="";
+  for(const sec of SCHEMA){
+    const t=document.createElement("div");
+    t.className="tab"+(sec.id===state.sectionId?" active":"");
+    t.textContent=sec.title;
+    t.onclick=()=>{ state.sectionId=sec.id; save(); render(); };
+    navEl.appendChild(t);
   }
 }
 
-function setAnswer(id, value){
-  state.answers[id] = value;
+function setA(id, val){
+  state.answers[id]=val;
   save();
-  renderReport();
+  updateKPIs();
 }
-
-function getAnswer(id){
+function getA(id){
   return state.answers[id];
 }
 
+/* --------- Widgets --------- */
+function chipGroupMulti(block){
+  const cur = Array.isArray(getA(block.id)) ? getA(block.id) : [];
+  const set = new Set(cur);
+  const box=document.createElement("div");
+  box.className="chips";
+  for(const opt of block.options){
+    const c=document.createElement("div");
+    const on=set.has(opt);
+    c.className="chip "+(on?"on":"off");
+    c.textContent=opt;
+    c.onclick=()=>{
+      const next = new Set(Array.isArray(getA(block.id))?getA(block.id):[]);
+      next.has(opt) ? next.delete(opt) : next.add(opt);
+      setA(block.id, Array.from(next));
+      render(); // pour rafraîchir le style
+    };
+    box.appendChild(c);
+  }
+  return box;
+}
+
+function chipGroupSingle(block){
+  const cur = getA(block.id) ?? "";
+  const box=document.createElement("div");
+  box.className="chips";
+  for(const opt of block.options){
+    const c=document.createElement("div");
+    const on= (cur===opt);
+    c.className="chip "+(on?"on":"off");
+    c.textContent=opt;
+    c.onclick=()=>{ setA(block.id, opt); render(); };
+    box.appendChild(c);
+  }
+  return box;
+}
+
+function inputText(block){
+  const t=document.createElement("textarea");
+  t.value = getA(block.id) ?? "";
+  t.oninput = ()=> setA(block.id, t.value);
+  return t;
+}
+function inputNumber(block){
+  const i=document.createElement("input");
+  i.type="number"; i.step="any";
+  i.value = (getA(block.id) ?? "");
+  i.oninput=()=> setA(block.id, i.value===""? "" : Number(i.value));
+  return i;
+}
+function inputDate(block){
+  const i=document.createElement("input");
+  i.type="date";
+  i.value = (getA(block.id) ?? "");
+  i.oninput=()=> setA(block.id, i.value);
+  return i;
+}
+
 function renderSection(){
-  const s = FORM.find(x=>x.id===state.sectionId) || FORM[0];
-  sectionEl.innerHTML = `<div style="font-weight:700;font-size:18px;margin:6px 0 12px">${s.title}</div>`;
-  for(const block of s.blocks){
-    const wrap = document.createElement("div");
+  const sec = SCHEMA.find(s=>s.id===state.sectionId) || SCHEMA[0];
+  formEl.innerHTML = "";
+  const h=document.createElement("div");
+  h.innerHTML = `<div style="font-weight:800;font-size:16px;margin:4px 0 2px">${sec.title}</div>
+                 <div class="mini">Astuce : clique sur les “chips” pour cocher/décocher. Tout est auto-sauvegardé.</div>`;
+  formEl.appendChild(h);
 
-    const lab = document.createElement("label");
-    lab.textContent = block.label;
-    wrap.appendChild(lab);
+  for(const block of sec.blocks){
+    const w=document.createElement("div");
+    const lab=document.createElement("label");
+    lab.textContent=block.label;
+    w.appendChild(lab);
 
-    const current = getAnswer(block.id);
+    let widget=null;
+    if(block.type==="multi") widget=chipGroupMulti(block);
+    else if(block.type==="single") widget=chipGroupSingle(block);
+    else if(block.type==="text") widget=inputText(block);
+    else if(block.type==="number") widget=inputNumber(block);
+    else if(block.type==="date") widget=inputDate(block);
 
-    if(block.type === "text"){
-      const ta = document.createElement(block.label.length>60 ? "textarea" : "textarea");
-      ta.rows = 3;
-      ta.value = current || "";
-      ta.oninput = ()=> setAnswer(block.id, ta.value);
-      wrap.appendChild(ta);
-    }
-
-    if(block.type === "boolean"){
-      const opts = ["Non","Oui"];
-      opts.forEach(val=>{
-        const line = document.createElement("div"); line.className="opt";
-        const input = document.createElement("input"); input.type="radio"; input.name=block.id;
-        input.checked = (current===val);
-        input.onchange = ()=> setAnswer(block.id, val);
-        const span = document.createElement("div"); span.textContent = val;
-        line.appendChild(input); line.appendChild(span);
-        wrap.appendChild(line);
-      });
-    }
-
-    if(block.type === "single"){
-      (block.options||[]).forEach(val=>{
-        const line = document.createElement("div"); line.className="opt";
-        const input = document.createElement("input"); input.type="radio"; input.name=block.id;
-        input.checked = (current===val);
-        input.onchange = ()=> setAnswer(block.id, val);
-        const span = document.createElement("div"); span.textContent = val;
-        line.appendChild(input); line.appendChild(span);
-        wrap.appendChild(line);
-      });
-    }
-
-    if(block.type === "multi"){
-      const arr = Array.isArray(current) ? current : [];
-      (block.options||[]).forEach(val=>{
-        const line = document.createElement("div"); line.className="opt";
-        const input = document.createElement("input"); input.type="checkbox";
-        input.checked = arr.includes(val);
-        input.onchange = ()=>{
-          const next = new Set(arr);
-          input.checked ? next.add(val) : next.delete(val);
-          setAnswer(block.id, Array.from(next));
-        };
-        const span = document.createElement("div"); span.textContent = val;
-        line.appendChild(input); line.appendChild(span);
-        wrap.appendChild(line);
-      });
-    }
-
-    wrap.style.marginBottom = "14px";
-    sectionEl.appendChild(wrap);
+    w.appendChild(widget);
+    w.style.marginBottom="12px";
+    formEl.appendChild(w);
   }
 }
 
-function renderReport(){
-  const lines = [];
-  for(const s of FORM){
-    const chunk = [];
-    for(const b of s.blocks){
-      const v = getAnswer(b.id);
-      if(typeof b.report === "function"){
-        const t = b.report(v);
-        if(t) chunk.push(t);
+/* --------- Génération du résultat --------- */
+function computeBMI(){
+  const p = Number(getA("poids"));
+  const tcm = Number(getA("taille"));
+  if(!p || !tcm) return null;
+  const tm = tcm/100;
+  const bmi = p/(tm*tm);
+  return Math.round(bmi*10)/10;
+}
+
+function suicideRiskLevel(){
+  const si = getA("si_idea");
+  const plan = getA("si_plan");
+  const att = getA("si_attempt_month");
+  const tsVie = getA("ts_vie");
+  const plus = (Array.isArray(getA("risk_plus"))?getA("risk_plus"):[]);
+  let score=0;
+  if(si==="Oui") score+=2;
+  if(plan==="Oui") score+=2;
+  if(att==="Oui") score+=3;
+  if(tsVie==="Oui") score+=2;
+  if(plus.includes("Substances")) score+=1;
+  if(plus.includes("Impulsivité")) score+=1;
+  if(plus.includes("Psychose")) score+=1;
+  if(plus.includes("Insomnie")) score+=1;
+  if(score>=7) return "Élevé";
+  if(score>=4) return "Modéré";
+  if(score>=1) return "Faible";
+  return "Non évalué";
+}
+
+function primaryDx(){
+  const hy = Array.isArray(getA("hypotheses"))?getA("hypotheses"):[];
+  if(hy.length===0) return "—";
+  // priorité simple (tu peux affiner)
+  const order = [
+    "Épisode dépressif avec éléments mixtes",
+    "Trouble bipolaire (à confirmer)",
+    "Psychose primaire (à discuter)",
+    "Symptômes psychotiques induits/majorés (substances/insomnie)",
+    "Épisode dépressif",
+    "Trouble anxieux / panique",
+    "PTSD / trauma",
+    "Trouble addictif",
+    "Trouble du sommeil",
+    "Trouble de personnalité (à explorer)",
+    "Autre"
+  ];
+  for(const o of order) if(hy.includes(o)) return o;
+  return hy[0];
+}
+
+function buildGridText(){
+  // texte structuré type "grille remplie"
+  const lines=[];
+  for(const sec of SCHEMA){
+    lines.push(`${sec.title}`);
+    for(const b of sec.blocks){
+      const v = getA(b.id);
+      let shown="";
+      if(b.type==="multi"){
+        shown = (Array.isArray(v) && v.length) ? v.join(", ") : "—";
+      }else if(b.type==="single"){
+        shown = v ? v : "—";
+      }else if(b.type==="text"){
+        shown = clean(v) ? clean(v) : "—";
+      }else if(b.type==="number"){
+        shown = (v===0 || v) ? String(v) : "—";
+      }else if(b.type==="date"){
+        shown = v ? v : "—";
       }
+      lines.push(`- ${b.label} : ${shown}`);
     }
-    if(chunk.length){
-      lines.push(`${s.title}\n${chunk.map(x=>"• "+x).join("\n")}`);
-    }
+    lines.push("");
   }
-  reportEl.value = lines.join("\n\n").trim();
+  const bmi = computeBMI();
+  if(bmi!==null) lines.push(`IMC (calculé) : ${bmi}`);
+  return lines.join("\n").trim();
 }
 
+function buildNarrative(){
+  const date = clean(getA("date_exam"));
+  const exam = clean(getA("examinateur"));
+  const pat = clean(getA("patient_nom"));
+  const age = getA("age");
+  const sexe = clean(getA("sexe"));
+  const motif = clean(getA("motif"));
+  const cadre = clean(getA("cadre"));
+
+  const reseau = Array.isArray(getA("reseau"))?getA("reseau"):[];
+  const addictions = Array.isArray(getA("addictions"))?getA("addictions"):[];
+  const addNotes = clean(getA("add_notes"));
+  const psyAnte = Array.isArray(getA("psy_ante"))?getA("psy_ante"):[];
+  const psyHosp = clean(getA("psy_hosp"));
+  const tsVie = clean(getA("ts_vie"));
+  const tsDet = clean(getA("ts_details"));
+  const medAnte = Array.isArray(getA("med_ante"))?getA("med_ante"):[];
+  const allergies = clean(getA("allergies"));
+  const famille = clean(getA("famille"));
+
+  const classes = Array.isArray(getA("classes"))?getA("classes"):[];
+  const tttDetails = clean(getA("ttt_details"));
+  const nonPharma = Array.isArray(getA("non_pharma"))?getA("non_pharma"):[];
+  const tttNotes = clean(getA("ttt_notes"));
+
+  const emploi = clean(getA("emploi"));
+  const logement = clean(getA("logement"));
+  const stress = Array.isArray(getA("stress"))?getA("stress"):[];
+  const socialNotes = clean(getA("social_notes"));
+
+  const apparence = Array.isArray(getA("apparence"))?getA("apparence"):[];
+  const langage = Array.isArray(getA("langage"))?getA("langage"):[];
+  const penseeForme = Array.isArray(getA("pensee_forme"))?getA("pensee_forme"):[];
+  const penseeCont = Array.isArray(getA("pensee_contenu"))?getA("pensee_contenu"):[];
+  const penseeNotes = clean(getA("pensee_notes"));
+  const humeur = Array.isArray(getA("humeur"))?getA("humeur"):[];
+  const humeurNotes = clean(getA("humeur_notes"));
+  const perception = Array.isArray(getA("perception"))?getA("perception"):[];
+  const perceptionNotes = clean(getA("perception_notes"));
+  const cognition = Array.isArray(getA("cognition"))?getA("cognition"):[];
+  const physio = Array.isArray(getA("fonctions_physio"))?getA("fonctions_physio"):[];
+  const mot = Array.isArray(getA("psycho_mot"))?getA("psycho_mot"):[];
+  const mseNotes = clean(getA("mse_notes"));
+
+  const wishDead = clean(getA("wish_dead"));
+  const selfharmUrge = clean(getA("selfharm_urge"));
+  const siIdea = clean(getA("si_idea"));
+  const siPlan = clean(getA("si_plan"));
+  const siAtt = clean(getA("si_attempt_month"));
+  const protect = Array.isArray(getA("protect"))?getA("protect"):[];
+  const riskPlus = Array.isArray(getA("risk_plus"))?getA("risk_plus"):[];
+  const riskNotes = clean(getA("risk_notes"));
+  const haCur = clean(getA("ha_current"));
+  const haNotes = clean(getA("ha_notes"));
+
+  const taS = getA("ta_sys"), taD = getA("ta_dia"), fc = getA("fc"), temp = getA("temp"), spo2 = getA("spo2");
+  const poids = getA("poids"), taille = getA("taille");
+  const bmi = computeBMI();
+  const somSignes = Array.isArray(getA("som_signes"))?getA("som_signes"):[];
+  const somNotes = clean(getA("som_notes"));
+  const paraclin = Array.isArray(getA("paraclin"))?getA("paraclin"):[];
+  const paraclinNotes = clean(getA("paraclin_notes"));
+
+  const hy = Array.isArray(getA("hypotheses"))?getA("hypotheses"):[];
+  const orient = clean(getA("niveau_soin"));
+  const plan = Array.isArray(getA("plan"))?getA("plan"):[];
+  const planNotes = clean(getA("plan_notes"));
+
+  const riskLevel = suicideRiskLevel();
+
+  // Construction narrative (phrases simples, cliniques)
+  const P=[];
+
+  // Intro
+  const headBits=[];
+  if(pat) headBits.push(pat);
+  if(age || age===0) headBits.push(`${age} ans`);
+  if(sexe) headBits.push(sexe);
+  const head = headBits.length ? headBits.join(", ") : "Patient·e";
+  const intro = `${head}${cadre?` se présente dans le cadre de ${cadre.toLowerCase()}`:""}${motif?` pour ${motif}`:"."}`;
+  P.push(intro.endsWith(".")?intro:intro+".");
+
+  if(date || exam){
+    const meta = `${date?`Examen du ${date}`:""}${date&&exam?" — ":""}${exam?`${exam}`:""}.`.trim();
+    if(meta!==".") P.push(meta);
+  }
+
+  // Contexte soins
+  const careBits=[];
+  const psyRef = clean(getA("psy_ref"));
+  const mg2 = clean(getA("mg"));
+  if(psyRef) careBits.push(`référent : ${psyRef}`);
+  if(mg2) careBits.push(`MG : ${mg2}`);
+  if(reseau.length) careBits.push(`réseau : ${joinNice(reseau)}`);
+  const notesPrise = clean(getA("notes_prise"));
+  if(careBits.length) P.push(`Prise en charge : ${careBits.join(" ; ")}.`);
+  if(notesPrise) P.push(`Notes coordination : ${notesPrise}.`);
+
+  // Antécédents
+  const ant=[];
+  if(psyAnte.length) ant.push(`antécédents psychiatriques : ${joinNice(psyAnte)}`);
+  if(addictions.length) ant.push(`consommations / comportements : ${joinNice(addictions)}`);
+  if(medAnte.length) ant.push(`antécédents somatiques : ${joinNice(medAnte)}`);
+  if(allergies) ant.push(`allergies : ${allergies}`);
+  if(famille) ant.push(`familiaux : ${famille}`);
+  if(ant.length) P.push(`Antécédents : ${ant.join(" ; ")}.`);
+  if(addNotes) P.push(`Détails addictologie : ${addNotes}.`);
+  if(psyHosp) P.push(`Parcours antérieur : ${psyHosp}.`);
+  if(tsVie) P.push(`Tentative(s) de suicide antérieure(s) : ${tsVie}${tsVie==="Oui" && tsDet ? ` (${tsDet})` : ""}.`);
+
+  // Traitements
+  const tt=[];
+  if(classes.length) tt.push(`classes : ${joinNice(classes)}`);
+  if(nonPharma.length) tt.push(`non pharmacologique : ${joinNice(nonPharma)}`);
+  if(tttDetails) tt.push(`détails : ${tttDetails}`);
+  if(tt.length) P.push(`Traitements : ${tt.join(" ; ")}.`);
+  if(tttNotes) P.push(`Notes traitement : ${tttNotes}.`);
+
+  // Social
+  const soc=[];
+  if(emploi) soc.push(`situation pro : ${emploi}`);
+  if(logement) soc.push(`logement : ${logement}`);
+  if(stress.length) soc.push(`stress : ${joinNice(stress)}`);
+  if(soc.length) P.push(`Contexte : ${soc.join(" ; ")}.`);
+  if(socialNotes) P.push(`Notes sociales : ${socialNotes}.`);
+
+  // MSE
+  const mse=[];
+  if(apparence.length) mse.push(`présentation/comportement : ${joinNice(apparence)}`);
+  if(langage.length) mse.push(`langage : ${joinNice(langage)}`);
+  if(penseeForme.length) mse.push(`pensée (forme) : ${joinNice(penseeForme)}`);
+  if(penseeCont.length) mse.push(`pensée (contenu) : ${joinNice(penseeCont)}`);
+  if(humeur.length) mse.push(`humeur/affect : ${joinNice(humeur)}`);
+  if(perception.length) mse.push(`perception : ${joinNice(perception)}`);
+  if(cognition.length) mse.push(`cognition/insight : ${joinNice(cognition)}`);
+  if(physio.length) mse.push(`fonctions physiologiques : ${joinNice(physio)}`);
+  if(mot.length) mse.push(`motricité : ${joinNice(mot)}`);
+  if(mse.length) P.push(`Examen mental : ${mse.join(" ; ")}.`);
+  if(penseeNotes) P.push(`Pensée — notes : ${penseeNotes}.`);
+  if(humeurNotes) P.push(`Affectivité — notes : ${humeurNotes}.`);
+  if(perceptionNotes) P.push(`Perception — notes : ${perceptionNotes}.`);
+  if(mseNotes) P.push(`Notes MSE : ${mseNotes}.`);
+
+  // Risques
+  const r=[];
+  if(wishDead) r.push(`souhait d’être mort·e : ${wishDead}`);
+  if(selfharmUrge) r.push(`volonté de se faire du mal : ${selfharmUrge}`);
+  if(siIdea) r.push(`idées suicidaires : ${siIdea}`);
+  if(siPlan) r.push(`plan/scénario : ${siPlan}`);
+  if(siAtt) r.push(`tentative (mois) : ${siAtt}`);
+  if(r.length) P.push(`Risque suicidaire (dernier mois) : ${r.join(" ; ")}. Niveau estimé : ${riskLevel}.`);
+  if(protect.length) P.push(`Facteurs protecteurs : ${joinNice(protect)}.`);
+  if(riskPlus.length) P.push(`Facteurs aggravants : ${joinNice(riskPlus)}.`);
+  if(riskNotes) P.push(`Notes risque : ${riskNotes}.`);
+  if(haCur) P.push(`Hétéro-agressivité : idées actuelles ${haCur}.`);
+  if(haNotes) P.push(`Notes hétéro-agressivité : ${haNotes}.`);
+
+  // Somatique
+  const vit=[];
+  if(taS && taD) vit.push(`TA ${taS}/${taD}`);
+  if(fc) vit.push(`FC ${fc}`);
+  if(temp) vit.push(`T° ${temp}`);
+  if(spo2) vit.push(`SpO2 ${spo2}%`);
+  if(poids) vit.push(`poids ${poids} kg`);
+  if(taille) vit.push(`taille ${taille} cm`);
+  if(bmi!==null) vit.push(`IMC ${bmi}`);
+  if(vit.length) P.push(`Somatique : ${vit.join(" ; ")}.`);
+  if(somSignes.length) P.push(`Signes associés : ${joinNice(somSignes)}.`);
+  if(somNotes) P.push(`Examen clinique — notes : ${somNotes}.`);
+  if(paraclin.length) P.push(`Paraclinique : ${joinNice(paraclin)}.`);
+  if(paraclinNotes) P.push(`Paraclinique — notes : ${paraclinNotes}.`);
+
+  // Conclusion/Plan
+  if(hy.length) P.push(`Hypothèses : ${joinNice(hy)}.`);
+  if(orient) P.push(`Orientation : ${orient}.`);
+  if(plan.length) P.push(`Plan : ${joinNice(plan)}.`);
+  if(planNotes) P.push(`Synthèse/plan détaillé : ${planNotes}.`);
+
+  return P.join("\n\n").trim();
+}
+
+function buildOutput(){
+  return (state.mode==="grille") ? buildGridText() : buildNarrative();
+}
+
+/* --------- KPI / checks --------- */
+function countAnswered(){
+  let n=0;
+  for(const sec of SCHEMA){
+    for(const b of sec.blocks){
+      const v=getA(b.id);
+      if(b.type==="multi" && Array.isArray(v) && v.length) n++;
+      if(b.type==="single" && clean(v)) n++;
+      if(b.type==="text" && clean(v)) n++;
+      if(b.type==="number" && (v===0 || v)) n++;
+      if(b.type==="date" && clean(v)) n++;
+    }
+  }
+  return n;
+}
+
+function updateKPIs(){
+  document.getElementById("kAnswered").textContent = String(countAnswered());
+  const r = suicideRiskLevel();
+  document.getElementById("kRisk").textContent = r;
+  const dx = primaryDx();
+  document.getElementById("kDx").textContent = dx;
+}
+
+function runChecks(){
+  const issues=[];
+  const si = getA("si_idea"), plan=getA("si_plan"), att=getA("si_attempt_month");
+  const protect = Array.isArray(getA("protect"))?getA("protect"):[];
+  if((si==="Oui" || plan==="Oui" || att==="Oui") && protect.length===0){
+    issues.push("Risque suicidaire positif mais aucun facteur protecteur renseigné.");
+  }
+  const pc = Array.isArray(getA("pensee_contenu"))?getA("pensee_contenu"):[];
+  const perc = Array.isArray(getA("perception"))?getA("perception"):[];
+  if(pc.includes("Idées délirantes (autre thème)") && clean(getA("pensee_notes"))===""){
+    issues.push("Idées délirantes cochées mais notes sur thème/mécanisme/critique vides.");
+  }
+  if((perc.includes("Hallucinations auditives") || perc.includes("Automatisme mental (ressenti)")) && clean(getA("perception_notes"))===""){
+    issues.push("Perceptions anormales cochées mais notes vides.");
+  }
+  const poids=getA("poids"), taille=getA("taille");
+  if((poids && !taille) || (!poids && taille)){
+    issues.push("Somatique : poids/taille incomplets (IMC non calculable).");
+  }
+  const hy = Array.isArray(getA("hypotheses"))?getA("hypotheses"):[];
+  if(hy.length===0) issues.push("Conclusion : aucune hypothèse diagnostique cochée.");
+  checksEl.textContent = issues.length ? ("Contrôles :\n- "+issues.join("\n- ")) : "Contrôles : rien à signaler.";
+}
+
+/* --------- Actions UI --------- */
 function render(){
   renderNav();
   renderSection();
-  renderReport();
+  outEl.value = buildOutput();
+  document.getElementById("modeLabel").textContent = (state.mode==="grille"?"Grille":"Narratif");
+  updateKPIs();
+  checksEl.textContent = "";
 }
 
-/** ============
- *  4) Boutons utilitaires
- *  ============ */
-document.getElementById("btnCopy").onclick = async ()=>{
+document.getElementById("btnGen").onclick=()=>{ outEl.value = buildOutput(); updateKPIs(); flashBadge("Généré ✓"); };
+document.getElementById("btnCheck").onclick=()=> runChecks();
+
+document.getElementById("btnMode").onclick=()=>{
+  state.mode = (state.mode==="narratif") ? "grille" : "narratif";
+  save(); render();
+};
+
+document.getElementById("btnCopy").onclick=async()=>{
   try{
-    await navigator.clipboard.writeText(reportEl.value || "");
+    await navigator.clipboard.writeText(outEl.value||"");
+    flashBadge("Copié ✓");
   }catch(e){
     alert("Copie impossible (permissions navigateur).");
   }
 };
 
-document.getElementById("btnReset").onclick = ()=>{
-  localStorage.removeItem(KEY);
-  location.reload();
-};
-
-document.getElementById("btnExport").onclick = ()=>{
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+document.getElementById("btnExport").onclick=()=>{
+  const payload = { schemaVersion:"v1", mode:state.mode, answers:state.answers, generated:buildOutput() };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "eps-reponses.json";
+  a.href=url; a.download="eps-clickreport.json";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 };
 
+document.getElementById("btnReset").onclick=()=>{
+  localStorage.removeItem(KEY);
+  location.reload();
+};
+
+/* --------- Init --------- */
 render();
 </script>
+
 </body>
 </html>
